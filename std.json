@@ -49,6 +49,17 @@
       }
     },
     {
+      "id": "seamlessphoto",
+      "type": "raster",
+      "source": "s",
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "raster-opacity": 1
+      }
+    },
+    {
       "id": "水域",
       "maxzoom": 17,
       "type": "fill",
@@ -13995,17 +14006,6 @@
         ],
         "text-halo-color": "rgba(255,255,255,1)",
         "text-halo-width": 1
-      }
-    },
-    {
-      "id": "seamlessphoto",
-      "type": "raster",
-      "source": "s",
-      "layout": {
-        "visibility": "visible"
-      },
-      "paint": {
-        "raster-opacity": 1
       }
     }
   ]
