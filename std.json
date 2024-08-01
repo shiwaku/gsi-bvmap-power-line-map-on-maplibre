@@ -6,11 +6,11 @@
   "sources": {
     "v": {
       "type": "vector",
-      "minzoom": 4,
-      "maxzoom": 16,
       "tiles": [
         "pmtiles://https://cyberjapandata.gsi.go.jp/xyz/optimal_bvmap-v1/optimal_bvmap-v1.pmtiles/{z}/{x}/{y}"
       ],
+      "minzoom": 4,
+      "maxzoom": 16,
       "attribution": "<a href='https://github.com/gsi-cyberjapan/optimal_bvmap' target='_blank'>国土地理院最適化ベクトルタイル(標準地図風スタイル)</a>"
     },
     "s": {
@@ -18,6 +18,8 @@
       "tiles": [
         "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
       ],
+      "minzoom": 2,
+      "maxzoom": 18,
       "attribution": "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"
     }
   },
@@ -38,6 +40,15 @@
       }
     },
     {
+      "id": "行政区画",
+      "type": "fill",
+      "source": "v",
+      "source-layer": "AdmArea",
+      "paint": {
+        "fill-color": "rgba(255,255,255,1)"
+      }
+    },
+    {
       "id": "seamlessphoto",
       "type": "raster",
       "source": "s",
@@ -46,15 +57,6 @@
       },
       "paint": {
         "raster-opacity": 1
-      }
-    },
-    {
-      "id": "行政区画",
-      "type": "fill",
-      "source": "v",
-      "source-layer": "AdmArea",
-      "paint": {
-        "fill-color": "rgba(255,255,255,1)"
       }
     },
     {
