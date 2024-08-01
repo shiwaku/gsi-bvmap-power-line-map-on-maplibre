@@ -42,8 +42,8 @@
       container: 'map',
       style: 'std.json',
       hash: true,
-      zoom: 11.48,
-      center: [139.107, 35.9984],
+      zoom: 5.13,
+      center: [138.25, 38.71],
       pitch: 69,
       maxPitch: 85,
       bearing: 29.7,
@@ -75,7 +75,7 @@
     // Attributionを折りたたみ表示
     map.addControl(new maplibregl.AttributionControl({
       compact: true,
-      customAttribution: '<a href="https://twitter.com/shi__works" target="_blank">X(旧Twitter)</a> | <a href="" target="_blank">Github</a> | <a href="https://opennagasaki.nerc.or.jp/" target="_blank">オープンナガサキ</a> '
+      customAttribution: '<a href="https://twitter.com/shi__works" target="_blank">X(旧Twitter)</a> | <a href="" target="_blank">Github</a>'
     }));
 
     // 3D地形コントロール表示
@@ -98,8 +98,10 @@
         maxzoom: 17
       });
 
+      /*
       // 標高タイルセット
       map.setTerrain({ 'source': 'aist-dem-terrain-rgb', 'exaggeration': 1 });
+      */
 
       // 最適化ベクトルタイル 送電線（PMTiles）ソース
       map.addSource("power-line", {
@@ -108,6 +110,7 @@
         attribution: '<a href="">国土地理院最適化ベクトルタイル（送電線）</a>'
       });
 
+      /*
       // 最適化ベクトルタイル 送電線ラインレイヤ
       map.addLayer({
         'id': 'power-line',
@@ -121,6 +124,57 @@
         'paint': {
           'line-color': 'rgba(255, 0, 0, 255)',
           'line-width': 5
+        }
+      });
+      */
+
+      // 最適化ベクトルタイル 送電線ラインレイヤ
+      map.addLayer({
+        id: 'power-line-1',
+        type: 'line',
+        'source': 'power-line',
+        'source-layer': "PwrTrnsmL",
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': 'rgba(0, 112, 32, 0.3)',
+          'line-width': 12,
+          'line-blur': 0.8
+        }
+      });
+
+      // 最適化ベクトルタイル 送電線ラインレイヤ
+      map.addLayer({
+        id: 'power-line-2',
+        type: 'line',
+        'source': 'power-line',
+        'source-layer': "PwrTrnsmL",
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': 'rgba(0, 172, 64, 0.6)',
+          'line-width': 6,
+          'line-blur': 0.4
+        }
+      });
+
+      // 最適化ベクトルタイル 送電線ラインレイヤ
+      map.addLayer({
+        id: 'power-line-3',
+        type: 'line',
+        'source': 'power-line',
+        'source-layer': "PwrTrnsmL",
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': 'rgba(220, 236, 220, 1)',
+          'line-width': 1.5
         }
       });
 
