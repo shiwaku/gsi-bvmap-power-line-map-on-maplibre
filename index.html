@@ -88,6 +88,23 @@
       })
     );
 
+    // 環境光を作成
+    const ambientLight = new deck.AmbientLight({
+      color: [255, 255, 255],
+      intensity: 2.0
+    });
+
+    // 平行ライト作成
+    const directionalLight = new deck.DirectionalLight({
+      color: [255, 255, 255],
+      intensity: 5.0,
+      direction: [-3, -9, -1]
+    });
+
+    // ライティングエフェクトを作成
+    const lightingEffect = new deck.LightingEffect({ ambientLight, directionalLight });
+
+
     // マップをロード
     map.on('load', () => {
       // 標高タイルソース
@@ -178,18 +195,38 @@
         }
       });
 
-      // MapboxLayerを使ったインターリーブ
-      const tile3dLayer = new deck.MapboxLayer({
-        id: "shizuoka-pc",
-        type: deck.Tile3DLayer,
-        pointSize: 1,
-        // 3次元点群データ（3D iles）ソース
-        data: 'https:///shiworks.xsrv.jp/3dtiles/shizuoka-pc/sunen-substation/tileset.json',
-        loader: Tiles3DLoader
+      // MapboxOverlayを使ったインターリーブ
+      // 点群データ
+      const overlay = new deck.MapboxOverlay({
+        interleaved: true,
+        layers: [
+          new deck.Tile3DLayer({
+            id: "tile3dlayer-1",
+            pointSize: 1,
+            data: 'https:///shiworks.xsrv.jp/3dtiles/shizuoka-pc/sunen-substation/tileset.json',
+            loader: Tiles3DLoader,
+            onTileLoad: d => {
+              const { content } = d;
+              content.cartographicOrigin.z -= 0;
+            }
+          }),
+          new deck.Tile3DLayer({
+            id: "tile3dlayer-2",
+            pointSize: 1,
+            data: 'https://d21pj9gigeop84.cloudfront.net/data/point-cloud/lp-2024/22130_hamamatsu-shi_updated_2024_v3/tileset.json',
+            loader: Tiles3DLoader,
+            onTileLoad: d => {
+              const { content } = d;
+              content.cartographicOrigin.z -= 0;
+            }
+          })
+        ],
+        effects: [
+          lightingEffect
+        ],
       });
 
-      // 3次元点群データ（3D Tiles）レイヤ
-      map.addLayer(tile3dLayer);
+      map.addControl(overlay);
 
       // Skyレイヤ
       map.setSky({
