@@ -94,15 +94,18 @@
       intensity: 3.0
     });
 
+    /*
     // 平行ライト作成
     const directionalLight = new deck.DirectionalLight({
       color: [255, 255, 255],
       intensity: 9.0,
       direction: [-3, -9, -1]
     });
+    */
 
     // ライティングエフェクトを作成
-    const lightingEffect = new deck.LightingEffect({ ambientLight, directionalLight });
+    // const lightingEffect = new deck.LightingEffect({ ambientLight, directionalLight });
+    const lightingEffect = new deck.LightingEffect({ ambientLight });
 
 
     // マップをロード
