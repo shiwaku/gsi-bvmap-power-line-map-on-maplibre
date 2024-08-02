@@ -1,12 +1,14 @@
 <html>
 
 <head>
-  <title>国土地理院 最適化ベクトルタイル 送電線</title>
+  <title>国土地理院 最適化ベクトルタイル 送電線 + 静岡県点群データ</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src='https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.js'></script>
   <link href='https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.css' rel='stylesheet' />
   <script src="https://unpkg.com/pmtiles@2.11.0/dist/index.js"></script>
+  <script src="https://unpkg.com/deck.gl@8.9.0/dist.min.js"></script>
+  <script src="https://unpkg.com/@loaders.gl/3d-tiles@^2.3.0/dist/dist.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -42,11 +44,11 @@
       container: 'map',
       style: 'std.json',
       hash: true,
-      zoom: 5.13,
-      center: [138.25, 38.71],
-      pitch: 0,
+      zoom: 17.15,
+      center: [138.062173, 34.809284],
+      pitch: 78,
       maxPitch: 85,
-      bearing: 0,
+      bearing: -46.4,
       attributionControl: false,
     })
 
@@ -75,33 +77,31 @@
     // Attributionを折りたたみ表示
     map.addControl(new maplibregl.AttributionControl({
       compact: true,
-      customAttribution: '<a href="https://twitter.com/shi__works" target="_blank">X(旧Twitter)</a> | <a href="https://github.com/shiwaku/gsi-bvmap-power-line-map-on-maplibre" target="_blank">Github</a>'
+      customAttribution: '<a href="https://twitter.com/shi__works" target="_blank">X(旧Twitter)</a> | <a href="https://github.com/shiwaku/gsi-bvmap-power-line-map-on-maplibre" target="_blank">Github</a> | <a href="https://www.geospatial.jp/ckan/dataset/virtual-shizuoka-mw" target="_blank">静岡県 3次元点群データ</a>'
     }));
 
     // 3D地形コントロール表示
     map.addControl(
       new maplibregl.TerrainControl({
-        source: 'aist-dem-terrain-rgb',
+        source: 'gsidem-terrain-rgb',
         exaggeration: 1 // 標高を強調する倍率
       })
     );
 
+    // マップをロード
     map.on('load', () => {
       // 標高タイルソース
-      map.addSource("aist-dem-terrain-rgb", {
+      map.addSource("gsidem-terrain-rgb", {
         type: 'raster-dem',
-        tiles: ['https://gsj-seamless.jp/seamless/elev/php/terrainRGB.php?url='
-          + 'https://tiles.gsj.jp/tiles/elev/mixed/{z}/{y}/{x}.png',
+        tiles: [
+          'https://xs489works.xsrv.jp/raster-tiles/gsi/gsi-dem-terrain-rgb/{z}/{x}/{y}.png',
         ],
-        attribution: '<a href="https://tiles.gsj.jp/tiles/elev/tiles.html" target="_blank">産総研 シームレス標高タイル(統合DEM)</a>',
-        tileSize: 256,
-        maxzoom: 17
+        attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html#dem" target="_blank">地理院タイル(標高タイル)</a>',
+        tileSize: 256
       });
 
-      /*
       // 標高タイルセット
-      map.setTerrain({ 'source': 'aist-dem-terrain-rgb', 'exaggeration': 1 });
-      */
+      map.setTerrain({ 'source': 'gsidem-terrain-rgb', 'exaggeration': 1 });
 
       // 最適化ベクトルタイル 送電線（PMTiles）ソース
       map.addSource("power-line", {
@@ -177,6 +177,19 @@
           'line-width': 1.5
         }
       });
+
+      // MapboxLayerを使ったインターリーブ
+      const tile3dLayer = new deck.MapboxLayer({
+        id: "shizuoka-pc",
+        type: deck.Tile3DLayer,
+        pointSize: 1,
+        // 3次元点群データ（3D iles）ソース
+        data: 'https:///shiworks.xsrv.jp/3dtiles/shizuoka-pc/sunen-substation/tileset.json',
+        loader: Tiles3DLoader
+      });
+
+      // 3次元点群データ（3D Tiles）レイヤ
+      map.addLayer(tile3dLayer);
 
       // Skyレイヤ
       map.setSky({
