@@ -77,7 +77,7 @@
     // Attributionを折りたたみ表示
     map.addControl(new maplibregl.AttributionControl({
       compact: true,
-      customAttribution: '<a href="https://twitter.com/shi__works" target="_blank">X(旧Twitter)</a> | <a href="https://github.com/shiwaku/gsi-bvmap-power-line-map-on-maplibre" target="_blank">Github</a> | <a href="https://www.geospatial.jp/ckan/dataset/virtual-shizuoka-mw" target="_blank">静岡県 3次元点群データ</a>'
+      customAttribution: '<a href="https://twitter.com/shi__works" target="_blank">X(旧Twitter)</a> | <a href="https://github.com/shiwaku/gsi-bvmap-power-line-map-on-maplibre" target="_blank">Github</a> | <a href="https://www.geospatial.jp/ckan/dataset/virtual-shizuoka-mw" target="_blank">静岡県 3次元点群データ</a> | <a href="https://sketchfab.com/3d-models/dji-tello-36365bad0ebd46428e6241676725dcec" target="_blank">Dji Tello</a> by <a href="https://sketchfab.com/Temooor" target="_blank">Temoor</a> licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>'
     }));
 
     // 3D地形コントロール表示
@@ -107,6 +107,9 @@
     // const lightingEffect = new deck.LightingEffect({ ambientLight, directionalLight });
     const lightingEffect = new deck.LightingEffect({ ambientLight });
 
+    const MODEL_URL = "data/dji_tello_1.glb";
+
+    let scenegraphLayer;
 
     // マップをロード
     map.on('load', () => {
@@ -198,6 +201,7 @@
         }
       });
 
+      /*
       // MapboxOverlayを使ったインターリーブ
       // 点群データ
       const overlay = new deck.MapboxOverlay({
@@ -213,7 +217,6 @@
               content.cartographicOrigin.z -= 0;
             }
           }),
-          /*
           new deck.Tile3DLayer({
             id: "tile3dlayer-2",
             pointSize: 1,
@@ -224,7 +227,6 @@
               content.cartographicOrigin.z -= 0;
             }
           })
-          */
         ],
         effects: [
           lightingEffect
@@ -232,6 +234,80 @@
       });
 
       map.addControl(overlay);
+      */
+
+      // Tile3DLayerの初期化
+      const tile3dLayer = new deck.Tile3DLayer({
+        id: "tile3dlayer",
+        pointSize: 1,
+        data: 'https://shiworks.xsrv.jp/3dtiles/shizuoka-pc/sunen-substation/tileset.json',
+        loader: Tiles3DLoader,
+        onTileLoad: d => {
+          const { content } = d;
+          content.cartographicOrigin.z -= 0;
+        },
+        _lighting: 'pbr',
+        opacity: 1,
+      });
+
+      // ScenegraphLayerの初期化
+      let scenegraphLayer = new deck.ScenegraphLayer({
+        id: "scenegraphLayer",
+        data: [{}],
+        getPosition: () => {
+          const center = map.getCenter().toArray();
+          return [center[0], center[1], 135];
+        },
+        getOrientation: [0, -93, 90],
+        scenegraph: MODEL_URL,
+        sizeScale: 2,
+        _animations: {
+          '*': { speed: 1 }
+        },
+        _lighting: 'pbr',
+        pickable: true,
+        opacity: 1,
+      });
+
+      // MapboxOverlayの初期化
+      const overlay = new deck.MapboxOverlay({
+        interleaved: true,
+        layers: [tile3dLayer, scenegraphLayer],
+        effects: [lightingEffect],
+      });
+
+      map.addControl(overlay);
+
+      // ScenegraphLayerの更新関数
+      function updateScenegraphLayer() {
+        const center = map.getCenter().toArray();
+
+        // ScenegraphLayerを再生成して更新
+        scenegraphLayer = new deck.ScenegraphLayer({
+          id: "scenegraphLayer",
+          data: [{}],
+          getPosition: () => [center[0], center[1], 135],
+          getOrientation: [0, -93, 90],
+          scenegraph: MODEL_URL,
+          sizeScale: 2,
+          _lighting: 'pbr',
+          _animations: {
+            '*': { speed: 1 }
+          },
+          pickable: true,
+          opacity: 1,
+        });
+
+        // 再生成したレイヤーをセット
+        overlay.setProps({
+          layers: [tile3dLayer, scenegraphLayer]
+        });
+      }
+
+      // マップが移動した後に ScenegraphLayer を更新
+      map.on('move', () => {
+        updateScenegraphLayer();
+      });
 
       // Skyレイヤ
       map.setSky({
