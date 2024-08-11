@@ -18,11 +18,26 @@
       height: 100%;
       width: 100%;
     }
+
+    .drone {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      margin: auto;
+      width: 100px;
+      height: 100px;
+      z-index: 1;
+    }
   </style>
 </head>
 
 <body>
   <div id="map"></div>
+  <div>
+    <img src="img/drone.png" class="drone">
+  </div>
   <script type="text/javascript">
     // addProtocolの設定
     let protocol = new pmtiles.Protocol();
